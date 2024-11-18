@@ -1,0 +1,92 @@
+Practical 4:Pyspark
+
+
+!pip install pyspark
+
+
+import pyspark
+import pandas as pd
+
+
+pd.read_csv('/content/data.csv')
+
+
+from pyspark.sql import SparkSession
+spark = SparkSession.builder.appName('Practice').getOrCreate()
+
+
+spark = SparkSession.builder.appName('Practice').getOrCreate()
+
+
+df_pyspark = spark.read.option('header', 'true').csv('/content/data.csv',
+inferSchema=True)
+
+df_pyspark.show()
+
+
+type(df_pyspark)
+
+
+df_pyspark.printSchema()
+
+df_pyspark.head()
+
+df_pyspark.columns
+
+
+df_pyspark.select('Name').show()
+
+df_pyspark.select(['Name', 'Experience']).show()
+
+
+data types
+
+
+df_pyspark = df_pyspark.withColumn('Experience After 2 years',
+df_pyspark['Experience']+2)
+df_pyspark.show()
+
+
+
+df_pyspark=df_pyspark.drop('Experience After 2 years')
+df_pyspark.show()
+
+
+
+df_pyspark.withColumnRenamed('Name', 'New_Name').show()
+
+
+df_pyspark.na.drop().show()
+
+
+df_pyspark.na.drop(how='all').show()
+
+
+df_pyspark.na.drop(how='any').show()
+
+
+df_pyspark.na.drop(how='any', thresh=2).show()
+
+
+df_pyspark.na.drop(how='any', subset=['Experience']).show()
+
+
+df_pyspark.na.fill('Missing Values', ['Experience', 'Age']).show()
+
+
+df_pyspark.na.fill('Missing Values').show()
+
+
+
+#Writing the function to calculate the value at the place of null.
+
+from pyspark.ml.feature import Imputer
+imputer = Imputer(
+inputCols=['Age', 'Experience', 'Salary'],
+outputCols=["{}_imputed".format(c) for c in ['Age', 'Experience',
+'Salary']]
+).setStrategy('mean')
+
+#Add imputation columns to df
+
+imputer.fit(df_pyspark).transform(df_pyspark).show()
